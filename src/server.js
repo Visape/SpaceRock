@@ -27,7 +27,7 @@ class GameServer {
     this.lastrock = 0
     this.rockCount = 0
 
-    for (let i = 0; i < 200; ++i) {
+    for (let i = 0; i < 50; ++i) {
       const pill = {
         id: this.lastpill,
         x: Math.random() * 1850,
@@ -39,7 +39,7 @@ class GameServer {
       ++this.pillCount
     }
 
-    for (let i = 0; i < 300; ++i ) {
+    for (let i = 0; i < 60; ++i ) {
       const rock = {
         id: this.lastrock,
         x: Math.random() * 1850,
@@ -56,7 +56,7 @@ class GameServer {
   }
 
   onpillSpawn () {
-    if (this.pillCount < 200) {
+    if (this.pillCount < 50) {
       const pill = {
         id: this.lastpill,
         x: Math.random() * 1850,
@@ -72,7 +72,7 @@ class GameServer {
   }
 
   onrockSpawn () {
-    if (this.rockCount < 300) {
+    if (this.rockCount < 60) {
       const rock = {
         id: this.lastrock,
         x: Math.random() * 1850,
@@ -118,7 +118,6 @@ class GameServer {
   }
 
   onPlayerMoved (socket, inputs) {
-    console.log(`${new Date()}: ${socket.id} moved`)
     const player = this.players[socket.id]
     player.timestamp = Date.now()
     player.inputs = inputs
@@ -137,9 +136,10 @@ class GameServer {
 
     if (rock.player === null) {
 
-      let p = this.players[playerId].power*0.1
+      let p = Math.min(this.players[playerId].power*0.05, 1)
 
       if (p > 0) {
+        if (p < 1) p += 0.1
 
         let velx = this.players[playerId].vx
         let vely = this.players[playerId].vy
@@ -189,7 +189,7 @@ class GameServer {
 
   logic (delta) {
     const vInc = ACCEL * delta
-    const vDec = vInc * 0.3
+    const vDec = vInc * 0.5
     for (let playerId in this.players) {
       const player = this.players[playerId]
       const { inputs } = player
@@ -198,7 +198,7 @@ class GameServer {
       let ax = 0
       let ay = 0
 
-      if ((inputs.LEFT_ARROW) && (!inputs.RIGHT_ARROW) && (player.vx > -0.25)) {
+      if ((inputs.LEFT_ARROW) && (!inputs.RIGHT_ARROW) && (player.vx > -0.3)) {
         player.vx -= vInc
         ax = 1
       } else if ((ax === 0) && (!inputs.LEFT_ARROW) && (!inputs.RIGHT_ARROW) && (player.vx < 0)) {
@@ -206,7 +206,7 @@ class GameServer {
         if(player.vx > 0) player.vx = 0
       }
 
-      if ((inputs.RIGHT_ARROW) && (!inputs.LEFT_ARROW) && (player.vx < 0.25)) {
+      if ((inputs.RIGHT_ARROW) && (!inputs.LEFT_ARROW) && (player.vx < 0.3)) {
         player.vx += vInc
         ax = 1
       } else if ((ax === 0) && (!inputs.LEFT_ARROW) && (!inputs.RIGHT_ARROW) && (player.vx > 0)) {
@@ -214,7 +214,7 @@ class GameServer {
         if(player.vx < 0) player.vx = 0
       }
 
-      if ((inputs.UP_ARROW) && (!inputs.DOWN_ARROW) && (player.vy > -0.25)) {
+      if ((inputs.UP_ARROW) && (!inputs.DOWN_ARROW) && (player.vy > -0.3)) {
         player.vy -= vInc
         ay = 1
       } else if ((ay === 0) && (!inputs.DOWN_ARROW) && (!inputs.UP_ARROW) && (player.vy < 0)) {
@@ -222,7 +222,7 @@ class GameServer {
         if(player.vy > 0) player.vy = 0
       }
 
-      if ((inputs.DOWN_ARROW) && (!inputs.UP_ARROW) && (player.vy < 0.25)) {
+      if ((inputs.DOWN_ARROW) && (!inputs.UP_ARROW) && (player.vy < 0.3)) {
         player.vy += vInc
         ay = 1
       } else if ((ay === 0) && (!inputs.DOWN_ARROW) && (!inputs.UP_ARROW) && (player.vy > 0)) {
@@ -256,7 +256,7 @@ class GameServer {
         if (this.players[playerId] != null) {
           let deltax = (this.players[playerId].x-this.rocks[rockId].x)
           let deltay = (this.players[playerId].y-this.rocks[rockId].y)
-          if ((-50 <= deltax) && (deltax <= 70) && (-50 <= deltay) && (deltay <= 70)) {
+          if ((-50 <= deltax) && (deltax <= 65) && (-50 <= deltay) && (deltay <= 65)) {
             this.onrockPull(rockId, playerId)
           }
         }
@@ -307,11 +307,11 @@ io.on('connection', function (socket) {
 
 setInterval(function () {
     game.onpillSpawn()
-  }, 1500)
+  }, 500)
 
 setInterval(function () {
     game.onrockSpawn()
-  }, 1500)
+  }, 500)
 
 const game = new GameServer()
 let past = Date.now()

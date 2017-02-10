@@ -62,42 +62,42 @@ class GameClient {
     let ax = 0
     let ay = 0
 
-    if ((inputs.LEFT_ARROW) && (!inputs.RIGHT_ARROW) && (player.vx > -0.25)) {
+    if ((inputs.LEFT_ARROW) && (!inputs.RIGHT_ARROW) && (player.vx > -0.3)) {
       player.x -= ACCEL * Math.pow(delta, 2) / 2
       player.vx -= ACCEL * delta
     } else if ((ax === 0) && (!inputs.LEFT_ARROW) && (!inputs.RIGHT_ARROW) && (player.vx < 0)) {
       player.x += ACCEL * Math.pow(delta, 2) / 2
-      player.vx +=ACCEL * delta * 0.3
+      player.vx +=ACCEL * delta * 0.5
       if(player.vx > 0) player.vx = 0
     }
 
-    if ((inputs.RIGHT_ARROW) && (!inputs.LEFT_ARROW) && (player.vx < 0.25)) {
+    if ((inputs.RIGHT_ARROW) && (!inputs.LEFT_ARROW) && (player.vx < 0.3)) {
       player.x += ACCEL * Math.pow(delta, 2) / 2
       player.vx += ACCEL * delta
       ax = 1
     } else if ((ax === 0) && (!inputs.LEFT_ARROW) && (!inputs.RIGHT_ARROW) && (player.vx > 0)) {
       player.x -= ACCEL * Math.pow(delta, 2) / 2
-      player.vx -= ACCEL * delta * 0.3
+      player.vx -= ACCEL * delta * 0.5
       if(player.vx < 0) player.vx = 0
     }
 
-    if ((inputs.UP_ARROW) && (!inputs.DOWN_ARROW) && (player.vy > -0.25)) {
+    if ((inputs.UP_ARROW) && (!inputs.DOWN_ARROW) && (player.vy > -0.3)) {
       player.y -= ACCEL * Math.pow(delta, 2) / 2
       player.vy -= ACCEL * delta
       ay = 1
     } else if ((ay === 0) && (!inputs.DOWN_ARROW) && (!inputs.UP_ARROW) && (player.vy < 0)) {
       player.y += ACCEL * Math.pow(delta, 2) / 2
-      player.vy += ACCEL * delta * 0.3
+      player.vy += ACCEL * delta * 0.5
       if(player.vy > 0) player.vy = 0
     }
 
-    if ((inputs.DOWN_ARROW) && (!inputs.UP_ARROW) && (player.vy < 0.25)) {
+    if ((inputs.DOWN_ARROW) && (!inputs.UP_ARROW) && (player.vy < 0.3)) {
       player.y += ACCEL * Math.pow(delta, 2) / 2
       player.vy += ACCEL * delta
       ay = 1
     } else if ((ay === 0) && (!inputs.DOWN_ARROW) && (!inputs.UP_ARROW) && (player.vy > 0)) {
       player.y -= ACCEL * Math.pow(delta, 2) / 2
-      player.vy -= ACCEL * delta * 0.3
+      player.vy -= ACCEL * delta * 0.5
       if(player.vy < 0) player.vy = 0
     }
   }
@@ -152,7 +152,7 @@ class GameClient {
   logic (delta) {
 
     const vInc = ACCEL * delta
-    const vDec = vInc * 0.3
+    const vDec = vInc * 0.5
     
     for (let playerId in this.players) {
       const player = this.players[playerId]
@@ -161,7 +161,7 @@ class GameClient {
       let ax = 0
       let ay = 0
 
-      if ((inputs.LEFT_ARROW) && (!inputs.RIGHT_ARROW) && (player.vx > -0.25)) {
+      if ((inputs.LEFT_ARROW) && (!inputs.RIGHT_ARROW) && (player.vx > -0.3)) {
         player.vx -= vInc
         ax = 1
       } else if ((ax === 0) && (!inputs.LEFT_ARROW) && (!inputs.RIGHT_ARROW) && (player.vx < 0)) {
@@ -169,7 +169,7 @@ class GameClient {
         if(player.vx > 0) player.vx = 0
       }
 
-      if ((inputs.RIGHT_ARROW) && (!inputs.LEFT_ARROW) && (player.vx < 0.25)) {
+      if ((inputs.RIGHT_ARROW) && (!inputs.LEFT_ARROW) && (player.vx < 0.3)) {
         player.vx += vInc
         ax = 1
       } else if ((ax === 0) && (!inputs.LEFT_ARROW) && (!inputs.RIGHT_ARROW) && (player.vx > 0)) {
@@ -177,7 +177,7 @@ class GameClient {
         if(player.vx < 0) player.vx = 0
       }
 
-      if ((inputs.UP_ARROW) && (!inputs.DOWN_ARROW) && (player.vy > -0.25)) {
+      if ((inputs.UP_ARROW) && (!inputs.DOWN_ARROW) && (player.vy > -0.3)) {
         player.vy -= vInc
         ay = 1
       } else if ((ay === 0) && (!inputs.DOWN_ARROW) && (!inputs.UP_ARROW) && (player.vy < 0)) {
@@ -185,7 +185,7 @@ class GameClient {
         if(player.vy > 0) player.vy = 0
       }
 
-      if ((inputs.DOWN_ARROW) && (!inputs.UP_ARROW) && (player.vy < 0.25)) {
+      if ((inputs.DOWN_ARROW) && (!inputs.UP_ARROW) && (player.vy < 0.3)) {
         player.vy += vInc
         ay = 1
       } else if ((ay === 0) && (!inputs.DOWN_ARROW) && (!inputs.UP_ARROW) && (player.vy > 0)) {
@@ -273,12 +273,17 @@ function gameRenderer (game) {
 
   ctx.drawImage (spaceImage, 0, 0, window.innerWidth, window.innerHeight)
 
+  let dead = 1
   for (let playerId in game.players) {
     const { color, x, y, power } = game.players[playerId]
 
 
-    if (playerId === myPlayerId) ctx.drawImage(myNaveImage, x, y, 50, 50);
+    if (playerId === myPlayerId) {
+      ctx.drawImage(myNaveImage, x, y, 50, 50);
+      dead = 0
+    }
     else ctx.drawImage(naveImage, x, y, 50, 50);
+
     
     ctx.fillStyle = 'black'
     ctx.font = "15px Arial"
@@ -299,6 +304,17 @@ function gameRenderer (game) {
       ctx.drawImage(rockImage, game.rocks[rockId].x, game.rocks[rockId].y, 70, 70);
     }
   }
+
+  if (dead === 1) {
+    ctx.fillStyle = 'white'
+    ctx.fillRect (100, 100, 500, 250)
+
+    ctx.fillStyle = 'red'
+    ctx.font = "30px Arial"
+    ctx.textAlign = 'center'
+    ctx.fillText("You are dead!", 350, 225)
+  }
+
 }
 
 let lastLogic = Date.now()

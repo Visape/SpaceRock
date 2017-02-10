@@ -118,7 +118,6 @@ class GameServer {
   }
 
   onPlayerMoved (socket, inputs) {
-    console.log(inputs)
     console.log(`${new Date()}: ${socket.id} moved`)
     const player = this.players[socket.id]
     player.timestamp = Date.now()
@@ -141,9 +140,6 @@ class GameServer {
       let p = this.players[playerId].power*0.1
 
       if (p > 0) {
-
-        console.log("VX: " +this.players[playerId].vx)
-        console.log("VY: " +this.players[playerId].vy)
 
         let velx = this.players[playerId].vx
         let vely = this.players[playerId].vy
@@ -180,29 +176,60 @@ class GameServer {
           delete this.players[playerId]
           io.sockets.emit('playerDead', playerId, rockId)
         }
-        console.log(this.rockCount)
         --this.rockCount
-        console.log(this.rockCount + "!")
         delete this.rocks[rockId]
       }
     }
   }
 
   onPlayerDisconnected (socket) {
-    console.log(`${socket.id} disconnected`)
     delete this.players[socket.id]
     socket.broadcast.emit('playerDisconnected', socket.id)
   }
 
   logic (delta) {
     const vInc = ACCEL * delta
+    const vDec = vInc * 0.3
     for (let playerId in this.players) {
       const player = this.players[playerId]
       const { inputs } = player
-      if ((inputs.LEFT_ARROW) && (player.vx > -0.25)) player.vx -= vInc
-      if ((inputs.RIGHT_ARROW) && (player.vx < 0.25)) player.vx += vInc
-      if ((inputs.UP_ARROW) && (player.vy > -0.25)) player.vy -= vInc
-      if ((inputs.DOWN_ARROW) && (player.vy < 0.25)) player.vy += vInc
+
+
+      let ax = 0
+      let ay = 0
+
+      if ((inputs.LEFT_ARROW) && (!inputs.RIGHT_ARROW) && (player.vx > -0.25)) {
+        player.vx -= vInc
+        ax = 1
+      } else if ((ax === 0) && (!inputs.LEFT_ARROW) && (!inputs.RIGHT_ARROW) && (player.vx < 0)) {
+        player.vx += vDec
+        if(player.vx > 0) player.vx = 0
+      }
+
+      if ((inputs.RIGHT_ARROW) && (!inputs.LEFT_ARROW) && (player.vx < 0.25)) {
+        player.vx += vInc
+        ax = 1
+      } else if ((ax === 0) && (!inputs.LEFT_ARROW) && (!inputs.RIGHT_ARROW) && (player.vx > 0)) {
+        player.vx -= vDec
+        if(player.vx < 0) player.vx = 0
+      }
+
+      if ((inputs.UP_ARROW) && (!inputs.DOWN_ARROW) && (player.vy > -0.25)) {
+        player.vy -= vInc
+        ay = 1
+      } else if ((ay === 0) && (!inputs.DOWN_ARROW) && (!inputs.UP_ARROW) && (player.vy < 0)) {
+        player.vy += vDec
+        if(player.vy > 0) player.vy = 0
+      }
+
+      if ((inputs.DOWN_ARROW) && (!inputs.UP_ARROW) && (player.vy < 0.25)) {
+        player.vy += vInc
+        ay = 1
+      } else if ((ay === 0) && (!inputs.DOWN_ARROW) && (!inputs.UP_ARROW) && (player.vy > 0)) {
+        player.vy -= vDec
+        if(player.vy < 0) player.vy = 0
+      }
+
 
       let bordex = (player.x + player.vx*delta)
       let bordey = (player.y + player.vy * delta)
@@ -242,16 +269,12 @@ class GameServer {
       let bordey = (rock.y + rock.vy * delta)
       if ((bordex > 0) && (bordex < 1850))rock.x += rock.vx * delta
       else {
-        console.log(this.rockCount)
         --this.rockCount
-        console.log(this.rockCount + "!!")
         delete this.rocks[rockId]
       }
       if ((bordey > 0) && (bordey < 900))rock.y += rock.vy * delta
       else {
-        console.log(this.rockCount)
         --this.rockCount
-        console.log(this.rockCount + "!!!")
         delete this.rocks[rockId]
       }
 

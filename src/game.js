@@ -36,7 +36,7 @@ class GameClient {
   }
 
   onPlayerMoved (player) {
-    //console.log(player)
+
     this.players[player.id] = player
 
     const delta = (lastLogic + clockDiff) - player.timestamp
@@ -58,19 +58,47 @@ class GameClient {
     }
 
     const { inputs } = player
-    if (inputs.LEFT_ARROW && !inputs.RIGHT_ARROW && player.vx > -0.25) {
+
+    let ax = 0
+    let ay = 0
+
+    if ((inputs.LEFT_ARROW) && (!inputs.RIGHT_ARROW) && (player.vx > -0.25)) {
       player.x -= ACCEL * Math.pow(delta, 2) / 2
       player.vx -= ACCEL * delta
-    } else if (!inputs.LEFT_ARROW && inputs.RIGHT_ARROW && player.vx < 0.25) {
+    } else if ((ax === 0) && (!inputs.LEFT_ARROW) && (!inputs.RIGHT_ARROW) && (player.vx < 0)) {
+      player.x += ACCEL * Math.pow(delta, 2) / 2
+      player.vx +=ACCEL * delta * 0.3
+      if(player.vx > 0) player.vx = 0
+    }
+
+    if ((inputs.RIGHT_ARROW) && (!inputs.LEFT_ARROW) && (player.vx < 0.25)) {
       player.x += ACCEL * Math.pow(delta, 2) / 2
       player.vx += ACCEL * delta
+      ax = 1
+    } else if ((ax === 0) && (!inputs.LEFT_ARROW) && (!inputs.RIGHT_ARROW) && (player.vx > 0)) {
+      player.x -= ACCEL * Math.pow(delta, 2) / 2
+      player.vx -= ACCEL * delta * 0.3
+      if(player.vx < 0) player.vx = 0
     }
-    if (inputs.UP_ARROW && !inputs.DOWN_ARROW && player.vy > -0.25) {
+
+    if ((inputs.UP_ARROW) && (!inputs.DOWN_ARROW) && (player.vy > -0.25)) {
       player.y -= ACCEL * Math.pow(delta, 2) / 2
       player.vy -= ACCEL * delta
-    } else if (!inputs.UP_ARROW && inputs.DOWN_ARROW && player.vx < 0.25) {
+      ay = 1
+    } else if ((ay === 0) && (!inputs.DOWN_ARROW) && (!inputs.UP_ARROW) && (player.vy < 0)) {
+      player.y += ACCEL * Math.pow(delta, 2) / 2
+      player.vy += ACCEL * delta * 0.3
+      if(player.vy > 0) player.vy = 0
+    }
+
+    if ((inputs.DOWN_ARROW) && (!inputs.UP_ARROW) && (player.vy < 0.25)) {
       player.y += ACCEL * Math.pow(delta, 2) / 2
       player.vy += ACCEL * delta
+      ay = 1
+    } else if ((ay === 0) && (!inputs.DOWN_ARROW) && (!inputs.UP_ARROW) && (player.vy > 0)) {
+      player.y -= ACCEL * Math.pow(delta, 2) / 2
+      player.vy -= ACCEL * delta * 0.3
+      if(player.vy < 0) player.vy = 0
     }
   }
 
@@ -86,13 +114,17 @@ class GameClient {
 
     let bordex = (rock.x + rock.vx*delta)
     let bordey = (rock.y + rock.vy * delta)
-    if ((bordex > 0) && (bordex < 1850))rock.x += rock.vx * delta
-    else {
-      delete this.rocks[rockId]
+    if ((bordex > 0) && (bordex < 1850)) {
+      rock.x += rock.vx * delta
     }
-    if ((bordey > 0) && (bordey < 900))rock.y += rock.vy * delta
     else {
-      delete this.rocks[rockId]
+      delete this.rocks[rock.id]
+    }
+    if ((bordey > 0) && (bordey < 900)) {
+      rock.y += rock.vy * delta
+    }
+    else {
+      delete this.rocks[rock.id]
     }
 
   }
@@ -118,14 +150,48 @@ class GameClient {
   }
 
   logic (delta) {
+
     const vInc = ACCEL * delta
+    const vDec = vInc * 0.3
+    
     for (let playerId in this.players) {
       const player = this.players[playerId]
       const { inputs } = player
-      if ((inputs.LEFT_ARROW) && (player.vx > -0.25)) player.vx -= vInc
-      if ((inputs.RIGHT_ARROW) && (player.vx < 0.25)) player.vx += vInc
-      if ((inputs.UP_ARROW) && (player.vy > -0.25)) player.vy -= vInc
-      if ((inputs.DOWN_ARROW) && (player.vy < 0.25)) player.vy += vInc
+
+      let ax = 0
+      let ay = 0
+
+      if ((inputs.LEFT_ARROW) && (!inputs.RIGHT_ARROW) && (player.vx > -0.25)) {
+        player.vx -= vInc
+        ax = 1
+      } else if ((ax === 0) && (!inputs.LEFT_ARROW) && (!inputs.RIGHT_ARROW) && (player.vx < 0)) {
+        player.vx +=vDec
+        if(player.vx > 0) player.vx = 0
+      }
+
+      if ((inputs.RIGHT_ARROW) && (!inputs.LEFT_ARROW) && (player.vx < 0.25)) {
+        player.vx += vInc
+        ax = 1
+      } else if ((ax === 0) && (!inputs.LEFT_ARROW) && (!inputs.RIGHT_ARROW) && (player.vx > 0)) {
+        player.vx -= vDec
+        if(player.vx < 0) player.vx = 0
+      }
+
+      if ((inputs.UP_ARROW) && (!inputs.DOWN_ARROW) && (player.vy > -0.25)) {
+        player.vy -= vInc
+        ay = 1
+      } else if ((ay === 0) && (!inputs.DOWN_ARROW) && (!inputs.UP_ARROW) && (player.vy < 0)) {
+        player.vy += vDec
+        if(player.vy > 0) player.vy = 0
+      }
+
+      if ((inputs.DOWN_ARROW) && (!inputs.UP_ARROW) && (player.vy < 0.25)) {
+        player.vy += vInc
+        ay = 1
+      } else if ((ay === 0) && (!inputs.DOWN_ARROW) && (!inputs.UP_ARROW) && (player.vy > 0)) {
+        player.vy -= vDec
+        if(player.vy < 0) player.vy = 0
+      }
 
       let bordex = (player.x + player.vx*delta)
       let bordey = (player.y + player.vy * delta)
@@ -197,21 +263,23 @@ pillImage.src = 'images/pill.png'
 var rockImage = new Image()
 rockImage.src = 'images/rock.png'
 
+var naveImage = new Image()
+naveImage.src = 'images/Jedi1.png'
+
+var myNaveImage = new Image()
+myNaveImage.src = 'images/Jedi2.png'
+
 function gameRenderer (game) {
 
   ctx.drawImage (spaceImage, 0, 0, window.innerWidth, window.innerHeight)
 
   for (let playerId in game.players) {
     const { color, x, y, power } = game.players[playerId]
-    /*var naveImage = new Image()
-    naveImage.src = 'images/nave.png'
 
-    ctx.drawImage(naveImage, x, y, 50, 50);*/
-    ctx.fillStyle = color
-    ctx.fillRect(x, y, 50, 50)
-    if (playerId === myPlayerId) {
-      ctx.strokeRect(x, y, 50, 50)
-    }
+
+    if (playerId === myPlayerId) ctx.drawImage(myNaveImage, x, y, 50, 50);
+    else ctx.drawImage(naveImage, x, y, 50, 50);
+    
     ctx.fillStyle = 'black'
     ctx.font = "15px Arial"
     ctx.textAlign = 'center'

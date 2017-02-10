@@ -27,7 +27,7 @@ class GameServer {
     this.lastrock = 0
     this.rockCount = 0
 
-    for (let i = 0; i < 50; ++i) {
+    for (let i = 0; i < 60; ++i) {
       const pill = {
         id: this.lastpill,
         x: Math.random() * 1850,
@@ -39,7 +39,7 @@ class GameServer {
       ++this.pillCount
     }
 
-    for (let i = 0; i < 60; ++i ) {
+    for (let i = 0; i < 70; ++i ) {
       const rock = {
         id: this.lastrock,
         x: Math.random() * 1850,
@@ -56,7 +56,7 @@ class GameServer {
   }
 
   onpillSpawn () {
-    if (this.pillCount < 50) {
+    if (this.pillCount < 60) {
       const pill = {
         id: this.lastpill,
         x: Math.random() * 1850,
@@ -72,7 +72,7 @@ class GameServer {
   }
 
   onrockSpawn () {
-    if (this.rockCount < 60) {
+    if (this.rockCount < 70) {
       const rock = {
         id: this.lastrock,
         x: Math.random() * 1850,
@@ -307,11 +307,11 @@ io.on('connection', function (socket) {
 
 setInterval(function () {
     game.onpillSpawn()
-  }, 500)
+  }, 250)
 
 setInterval(function () {
     game.onrockSpawn()
-  }, 500)
+  }, 250)
 
 const game = new GameServer()
 let past = Date.now()

@@ -1,0 +1,26 @@
+{
+  "name": "ipush",
+  "version": "1.0.0",
+  "description": "game",
+  "main": "index.js",
+  "scripts": {
+    "prebuild": "npm run test",
+    "build": "browserify src/game.js -o public/bundle.js",
+    "watch": "chokidar 'src/**/*.js' -c 'npm run build'",
+    "postinstall": "npm run build",
+    "start": "node src/server.js"
+  },
+  "author": "Victor Sanchez",
+  "license": "ISC",
+  "dependencies": {
+    "@dasilvacontin/keyboard": "^1.0.2",
+    "deep-equal": "^1.0.1",
+    "express": "^4.14.1",
+    "randomcolor": "^0.4.4",
+    "socket.io": "^1.7.2"
+  },
+  "devDependencies": {
+    "browserify": "^14.0.0",
+    "chokidar-cli": "^1.2.0"
+  }
+}

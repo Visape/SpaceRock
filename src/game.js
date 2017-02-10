@@ -297,4 +297,4 @@ socket.on('connect', function () {
   })
 })
 
-requestAnimationFrame(gameloop)
+requestAnimationFrame(gameloop);

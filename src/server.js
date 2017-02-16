@@ -108,6 +108,7 @@ class GameServer {
       id: socket.id,
       power: 1,
       score: 0,
+      name: "",
       inputs
     }
     this.players[socket.id] = player
@@ -116,6 +117,11 @@ class GameServer {
 
     // so that the new players appears on other people's screen
     this.onPlayerMoved(socket, inputs)
+  }
+
+  onPlayerNamed (name, playerId) {
+    this.players[playerId].name = name
+    io.sockets.emit('user named', name, playerId)
   }
 
   onPlayerMoved (socket, inputs) {
@@ -287,6 +293,10 @@ class GameServer {
 io.on('connection', function (socket) {
 
   game.onPlayerConnected(socket)
+
+  socket.on('username', function (name, playerId) {
+    game.onPlayerNamed (name, playerId)
+  })
 
   // let lastPongTimestamp
   // let ping = 50

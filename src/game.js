@@ -8,6 +8,7 @@ const socket = io()
 var dead = 0;
 
 let myPlayerId = null
+let myUserName = ""
 const myInputs = {
   LEFT_ARROW: false,
   RIGHT_ARROW: false,
@@ -28,6 +29,12 @@ class GameClient {
     this.players = serverPlayers
     this.pills = serverpills
     this.rocks = serverrocks
+    myUserName = prompt("Indica tu nombre de usuario: ")
+    socket.emit('username', myUserName, myPlayerId)
+  }
+
+  onPlayerNamed(name, playerId) {
+    this.players[playerId].name = name
   }
 
   onpillRespawn (pill) {
@@ -287,6 +294,7 @@ var heal = new howler.Howl({src: ['sound/vida.wav']})
 var hit = new howler.Howl({src: ['sound/golpe.wav']})
 var explosion = new howler.Howl({src: ['sound/explosion.mp3']})
 
+
 function gameRenderer (game) {
 
   let numplayers = 0
@@ -313,7 +321,7 @@ function gameRenderer (game) {
     ctx.fillStyle = 'white'
     ctx.font = "12px Arial"
     ctx.textAlign = 'left'
-    ctx.fillText(numplayers + ". USERNAME - " + game.players[playerId].score , 25, 18 + numplayers*20)
+    ctx.fillText(numplayers + ". " + game.players[playerId].name + " - " + game.players[playerId].score , 25, 18 + numplayers*20)
   }
   //pintar quadro de clasificacion
   ctx.fillStyle = 'white'
@@ -355,18 +363,6 @@ function gameRenderer (game) {
     ctx.fillText("You are dead!", 350, 225)
   }
 
-  /*ctx.fillStyle = 'white'
-  ctx.globalAlpha = 0.2
-  ctx.fillRect (10, 10, 100, 25 + numplayers*20)
-  ctx.globalAlpha = 1.0
-
-  for (let i = 0; i < numplayers; ++i) {
-    ctx.fillStyle = 'white'
-    ctx.font = "12px Arial"
-    ctx.textAlign = 'left'
-    ctx.fillText(i + ". USERNAME - " + game.players[] , 25, 35 + i*20)
-  }*/
-
 }
 
 let lastLogic = Date.now()
@@ -395,8 +391,8 @@ setInterval(startPingHandshake, 250)
 
 socket.on('connect', function () {
   socket.on('world:init', function (serverPlayers, myId, serverpills, serverrocks) {
-    game.onWorldInit(serverPlayers, serverpills, serverrocks)
     myPlayerId = myId
+    game.onWorldInit(serverPlayers, serverpills, serverrocks)
   })
   socket.on('playerMoved', game.onPlayerMoved.bind(game))
   socket.on('pillPicked', function (pillId, playerId) {
@@ -424,6 +420,10 @@ socket.on('connect', function () {
 
   socket.on('playerDead', function (playerId, rockId) {
     game.onPlayerDead (playerId, rockId)
+  })
+
+  socket.on('user named', function (name, playerId) {
+    game.onPlayerNamed (name, playerId)
   })
 
   socket.on('game:pong', (serverNow) => {

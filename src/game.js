@@ -301,6 +301,11 @@ function gameRenderer (game) {
 
   ctx.drawImage (spaceImage, 0, 0, window.innerWidth, window.innerHeight)
 
+  ctx.fillStyle = 'white'
+  ctx.font = "bold 14px Arial"
+  ctx.textAlign = 'left'
+  ctx.fillText("Kills: ", 25, 15 + 20)
+
   for (let playerId in game.players) {
     ++numplayers
     const { color, x, y, power } = game.players[playerId]
@@ -325,12 +330,12 @@ function gameRenderer (game) {
       ctx.fillStyle = 'yellow'
       ctx.font = "bold 12px Arial"
     }
-    ctx.fillText(game.players[playerId].name + " - " + game.players[playerId].score , 25, 18 + numplayers*20)
+    ctx.fillText(game.players[playerId].name + " - " + game.players[playerId].score , 25, 18 + (numplayers+1)*20)
   }
   //pintar quadro de clasificacion
   ctx.fillStyle = 'white'
   ctx.globalAlpha = 0.2
-  ctx.fillRect (10, 10, 200, 25 + numplayers*20)
+  ctx.fillRect (10, 10, 175, 25 + (numplayers+1)*20)
   ctx.globalAlpha = 1.0
   
 

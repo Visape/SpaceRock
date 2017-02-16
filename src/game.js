@@ -321,7 +321,11 @@ function gameRenderer (game) {
     ctx.fillStyle = 'white'
     ctx.font = "12px Arial"
     ctx.textAlign = 'left'
-    ctx.fillText(numplayers + ". " + game.players[playerId].name + " - " + game.players[playerId].score , 25, 18 + numplayers*20)
+    if (playerId === myPlayerId) {
+      ctx.fillStyle = 'yellow'
+      ctx.font = "bold 12px Arial"
+    }
+    ctx.fillText(game.players[playerId].name + " - " + game.players[playerId].score , 25, 18 + numplayers*20)
   }
   //pintar quadro de clasificacion
   ctx.fillStyle = 'white'

@@ -319,7 +319,7 @@ io.on('connection', function (socket) {
 
 setInterval(function () {
     game.onpillSpawn()
-  }, 500)
+  }, 2000)
 
 setInterval(function () {
     game.onrockSpawn()

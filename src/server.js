@@ -27,23 +27,23 @@ class GameServer {
     this.lastrock = 0
     this.rockCount = 0
 
-    for (let i = 0; i < 5; ++i) {
+    /*for (let i = 0; i < 5; ++i) {
       const pill = {
         id: this.lastpill,
-        x: 150 + Math.random() * 1450,
-        y: 100 + Math.random() * 600,
+        x: 150 + Math.random() * 1500,
+        y: 100 + Math.random() * 650,
         value: 1
       }
       this.pills[this.lastpill] = pill
       ++this.lastpill
       ++this.pillCount
-    }
+    }*/
 
-    for (let i = 0; i < 60; ++i ) {
+    for (let i = 0; i < 50; ++i ) {
       const rock = {
         id: this.lastrock,
-        x: 150 + Math.random() * 1450,
-        y: 100 + Math.random() * 600,
+        x: 150 + Math.random() * 1500,
+        y: 100 + Math.random() * 650,
         vx: 0,
         vy: 0,
         player: null,
@@ -59,8 +59,8 @@ class GameServer {
     if (this.pillCount < 5) {
       const pill = {
         id: this.lastpill,
-        x: 150 + Math.random() * 1450,
-        y: 100 + Math.random() * 600,
+        x: 150 + Math.random() * 1500,
+        y: 100 + Math.random() * 650,
         value: 1
       }
       this.pills[this.lastpill] = pill
@@ -72,11 +72,11 @@ class GameServer {
   }
 
   onrockSpawn () {
-    if (this.rockCount < 60) {
+    if (this.rockCount < 50) {
       const rock = {
         id: this.lastrock,
-        x: 150 + Math.random() * 1450,
-        y: 100 + Math.random() * 600,
+        x: 150 + Math.random() * 1500,
+        y: 100 + Math.random() * 650,
         vx: 0,
         vy: 0,
         player: null,
@@ -106,7 +106,7 @@ class GameServer {
       vy: 0,
       color: randomColor(),
       id: socket.id,
-      power: 1,
+      power: 5,
       score: 0,
       name: "",
       inputs
@@ -177,7 +177,7 @@ class GameServer {
     } else {
       if (rock.player !== playerId) {
         this.players[playerId].power -= 1
-        if (this.players[playerId].power >= 0) {
+        if (this.players[playerId].power > 0) {
           io.sockets.emit('playerHit', playerId, rockId)
         } else {
           ++this.players[this.rocks[rockId].player].score
@@ -323,7 +323,7 @@ setInterval(function () {
 
 setInterval(function () {
     game.onrockSpawn()
-  }, 200)
+  }, 50)
 
 const game = new GameServer()
 let past = Date.now()

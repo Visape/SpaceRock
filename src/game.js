@@ -150,17 +150,15 @@ class GameClient {
   }
 
   onPlayerHit (playerId, rockId) {
-    if (playerId === myPlayerId) hit.play()
+    hit.play()
     this.players[playerId].power -= 1
     this.rocks[rockId].hit = 1
   }
 
   onPlayerDead (playerId, rockId) {
     ++this.players[this.rocks[rockId].player].score
-    if (playerId === myPlayerId) {
-      explosion.play()
-      dead = 1;
-    }
+    explosion.play()
+    if (playerId === myPlayerId) dead = 1
     this.rocks[rockId].hit = 1
     delete this.players[playerId]
   }

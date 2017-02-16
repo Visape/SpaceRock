@@ -27,7 +27,7 @@ class GameServer {
     this.lastrock = 0
     this.rockCount = 0
 
-    for (let i = 0; i < 60; ++i) {
+    for (let i = 0; i < 25; ++i) {
       const pill = {
         id: this.lastpill,
         x: Math.random() * 1850,
@@ -39,15 +39,15 @@ class GameServer {
       ++this.pillCount
     }
 
-    for (let i = 0; i < 70; ++i ) {
+    for (let i = 0; i < 30; ++i ) {
       const rock = {
         id: this.lastrock,
         x: Math.random() * 1850,
         y: Math.random() * 900,
         vx: 0,
         vy: 0,
-        dmg: Math.floor(Math.random() * 3) + 1,
-        player: null
+        player: null,
+        hit: 0
       }
       this.rocks[this.lastrock] = rock
       ++this.lastrock
@@ -56,7 +56,7 @@ class GameServer {
   }
 
   onpillSpawn () {
-    if (this.pillCount < 60) {
+    if (this.pillCount < 20) {
       const pill = {
         id: this.lastpill,
         x: Math.random() * 1850,
@@ -72,15 +72,15 @@ class GameServer {
   }
 
   onrockSpawn () {
-    if (this.rockCount < 70) {
+    if (this.rockCount < 40) {
       const rock = {
         id: this.lastrock,
         x: Math.random() * 1850,
         y: Math.random() * 900,
         vx: 0,
         vy: 0,
-        dmg: Math.floor(Math.random() * 3) + 1,
-        player: null
+        player: null,
+        hit: 0
       }
       this.rocks[this.lastrock] = rock
       ++this.lastrock
@@ -106,7 +106,7 @@ class GameServer {
       vy: 0,
       color: randomColor(),
       id: socket.id,
-      power: 0,
+      power: 1,
       inputs
     }
     this.players[socket.id] = player
@@ -136,7 +136,7 @@ class GameServer {
 
     if (rock.player === null) {
 
-      let p = Math.min(this.players[playerId].power*0.05, 1)
+      let p = Math.min(this.players[playerId].power*0.1, 1)
 
       if (p > 0) {
         if (p < 1) p += 0.1
@@ -169,7 +169,7 @@ class GameServer {
       }
     } else {
       if (rock.player !== playerId) {
-        this.players[playerId].power -= rock.dmg
+        this.players[playerId].power -= 1
         if (this.players[playerId].power >= 0) {
           io.sockets.emit('playerHit', playerId, rockId)
         } else {
@@ -248,7 +248,7 @@ class GameServer {
         let deltax = (this.players[playerId].x-this.pills[pillId].x)
         let deltay = (this.players[playerId].y-this.pills[pillId].y)
         if ((-50 <= deltax) && (deltax <= 40) && (-50 <= deltay) && (deltay <= 40)) {
-          this.onpillPicked(pillId, playerId)
+          if (this.players[playerId].power < 5) this.onpillPicked(pillId, playerId)
         }
       }
 
@@ -307,11 +307,11 @@ io.on('connection', function (socket) {
 
 setInterval(function () {
     game.onpillSpawn()
-  }, 250)
+  }, 500)
 
 setInterval(function () {
     game.onrockSpawn()
-  }, 250)
+  }, 500)
 
 const game = new GameServer()
 let past = Date.now()

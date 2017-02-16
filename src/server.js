@@ -42,8 +42,8 @@ class GameServer {
     for (let i = 0; i < 50; ++i ) {
       const rock = {
         id: this.lastrock,
-        x: 150 + Math.random() * 1500,
-        y: 100 + Math.random() * 650,
+        x: 100 + Math.random() * 1600,
+        y: 50 + Math.random() * 700,
         vx: 0,
         vy: 0,
         player: null,
@@ -59,8 +59,8 @@ class GameServer {
     if (this.pillCount < 5) {
       const pill = {
         id: this.lastpill,
-        x: 150 + Math.random() * 1500,
-        y: 100 + Math.random() * 650,
+        x: 100 + Math.random() * 1600,
+        y: 50 + Math.random() * 700,
         value: 1
       }
       this.pills[this.lastpill] = pill
@@ -75,8 +75,8 @@ class GameServer {
     if (this.rockCount < 50) {
       const rock = {
         id: this.lastrock,
-        x: 150 + Math.random() * 1500,
-        y: 100 + Math.random() * 650,
+        x: 100 + Math.random() * 1600,
+        y: 50 + Math.random() * 700,
         vx: 0,
         vy: 0,
         player: null,
@@ -323,7 +323,7 @@ setInterval(function () {
 
 setInterval(function () {
     game.onrockSpawn()
-  }, 50)
+  }, 200)
 
 const game = new GameServer()
 let past = Date.now()

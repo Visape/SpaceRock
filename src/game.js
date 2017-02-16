@@ -114,7 +114,7 @@ class GameClient {
 
   onpillPicked (pillId, playerId) {
     if (playerId === myPlayerId) heal.play()
-    this.players[playerId].power += this.pills[pillId].value
+    if (this.players[playerId].power < 5) this.players[playerId].power += this.pills[pillId].value
     delete this.pills[pillId]
   }
 

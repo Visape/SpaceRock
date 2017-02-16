@@ -39,11 +39,11 @@ class GameServer {
       ++this.pillCount
     }
 
-    for (let i = 0; i < 30; ++i ) {
+    for (let i = 0; i < 50; ++i ) {
       const rock = {
         id: this.lastrock,
-        x: Math.random() * 1850,
-        y: Math.random() * 900,
+        x: Math.random() * 1750 + 50,
+        y: Math.random() * 800 + 50,
         vx: 0,
         vy: 0,
         player: null,
@@ -56,7 +56,7 @@ class GameServer {
   }
 
   onpillSpawn () {
-    if (this.pillCount < 20) {
+    if (this.pillCount < 25) {
       const pill = {
         id: this.lastpill,
         x: Math.random() * 1850,
@@ -72,11 +72,11 @@ class GameServer {
   }
 
   onrockSpawn () {
-    if (this.rockCount < 40) {
+    if (this.rockCount < 50) {
       const rock = {
         id: this.lastrock,
-        x: Math.random() * 1850,
-        y: Math.random() * 900,
+        x: Math.random() * 1750 + 50,
+        y: Math.random() * 800 + 50,
         vx: 0,
         vy: 0,
         player: null,

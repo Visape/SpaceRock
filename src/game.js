@@ -1,6 +1,7 @@
 /* globals requestAnimationFrame, io */
 const kbd = require('@dasilvacontin/keyboard')
 const deepEqual = require('deep-equal')
+const howler = require('howler')
 
 const socket = io()
 
@@ -105,6 +106,7 @@ class GameClient {
   }
 
   onpillPicked (pillId, playerId) {
+    if (playerId === myPlayerId) heal.play()
     this.players[playerId].power += this.pills[pillId].value
     delete this.pills[pillId]
   }
@@ -141,12 +143,17 @@ class GameClient {
   }
 
   onPlayerHit (playerId, rockId) {
+    if (playerId === myPlayerId) hit.play()
     this.players[playerId].power -= 1
     this.rocks[rockId].hit = 1
   }
 
   onPlayerDead (playerId, rockId) {
-    if (playerId === myPlayerId) dead = 1;
+    ++this.players[this.rocks[rockId].player].score
+    if (playerId === myPlayerId) {
+      explosion.play()
+      dead = 1;
+    }
     this.rocks[rockId].hit = 1
     delete this.players[playerId]
   }
@@ -250,8 +257,9 @@ function updateInputs () {
 }
 
 const canvas = document.createElement('canvas')
-canvas.width = window.innerWidth
-canvas.height = window.innerHeight
+canvas.width = 1950
+canvas.height = 1000
+
 document.body.appendChild(canvas)
 
 const ctx = canvas.getContext('2d')
@@ -275,14 +283,18 @@ naveImage1.src = 'images/naveAzul.png'
 var naveImage3 = new Image()
 naveImage3.src = 'images/naveAmarilla.png'
 
-/*var hit = new Howl({src: ['sound/golpe.wav']})
-var heal = new Howl({src: ['sound/heal.wav']})*/
+var heal = new howler.Howl({src: ['sound/vida.wav']})
+var hit = new howler.Howl({src: ['sound/golpe.wav']})
+var explosion = new howler.Howl({src: ['sound/explosion.mp3']})
 
 function gameRenderer (game) {
+
+  let numplayers = 0
 
   ctx.drawImage (spaceImage, 0, 0, window.innerWidth, window.innerHeight)
 
   for (let playerId in game.players) {
+    ++numplayers
     const { color, x, y, power } = game.players[playerId]
 
 
@@ -291,18 +303,29 @@ function gameRenderer (game) {
     }
     else ctx.drawImage(naveImage1, x, y, 50, 50);
 
-    
+    //pintar vida de cada player
     ctx.fillStyle = 'black'
     ctx.font = "bold 15px Arial"
     ctx.textAlign = 'center'
     ctx.fillText(power, x+25, y+25)
+
+    //pintar player en la clasificacion
+    ctx.fillStyle = 'white'
+    ctx.font = "12px Arial"
+    ctx.textAlign = 'left'
+    ctx.fillText(numplayers + ". USERNAME - " + game.players[playerId].score , 25, 18 + numplayers*20)
   }
+  //pintar quadro de clasificacion
+  ctx.fillStyle = 'white'
+  ctx.globalAlpha = 0.2
+  ctx.fillRect (10, 10, 200, 25 + numplayers*20)
+  ctx.globalAlpha = 1.0
   
+
   for (let pillId in game.pills) {
     if (game.pills[pillId] != null) {
 
       ctx.drawImage(pillImage, game.pills[pillId].x, game.pills[pillId].y, 40, 40);
-      //if (playerId === myPlayerId) heal.play()
     }
   }
 
@@ -310,10 +333,7 @@ function gameRenderer (game) {
     const rock = game.rocks[rockId]
     if (rock != null) {
       if (rock.hit > 0) {
-        if (rock.player === myPlayerId) {
-          ctx.drawImage(impacto1, rock.x, rock.y, 70, 70);
-          //hit.sound()
-        }
+        if (rock.player === myPlayerId) ctx.drawImage(impacto1, rock.x, rock.y, 70, 70);
         else ctx.drawImage(impacto3, rock.x, rock.y, 70, 70);
         ++rock.hit
         if (rock.hit === 10) {
@@ -334,6 +354,18 @@ function gameRenderer (game) {
     ctx.textAlign = 'center'
     ctx.fillText("You are dead!", 350, 225)
   }
+
+  /*ctx.fillStyle = 'white'
+  ctx.globalAlpha = 0.2
+  ctx.fillRect (10, 10, 100, 25 + numplayers*20)
+  ctx.globalAlpha = 1.0
+
+  for (let i = 0; i < numplayers; ++i) {
+    ctx.fillStyle = 'white'
+    ctx.font = "12px Arial"
+    ctx.textAlign = 'left'
+    ctx.fillText(i + ". USERNAME - " + game.players[] , 25, 35 + i*20)
+  }*/
 
 }
 
@@ -391,7 +423,6 @@ socket.on('connect', function () {
   })
 
   socket.on('playerDead', function (playerId, rockId) {
-    console.log("PLAYERDEAD!!!!!!")
     game.onPlayerDead (playerId, rockId)
   })
 

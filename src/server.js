@@ -107,6 +107,7 @@ class GameServer {
       color: randomColor(),
       id: socket.id,
       power: 1,
+      score: 0,
       inputs
     }
     this.players[socket.id] = player
@@ -173,6 +174,7 @@ class GameServer {
         if (this.players[playerId].power >= 0) {
           io.sockets.emit('playerHit', playerId, rockId)
         } else {
+          ++this.players[this.rocks[rockId].player].score
           delete this.players[playerId]
           io.sockets.emit('playerDead', playerId, rockId)
         }
